@@ -7,9 +7,9 @@
 ### Set Environment Variables
 
 ```powershell
-$AKS_NAME = "<your-cluster-name>"
-$RESOURCE_GROUP = "<your-resource-group>"
-$LOCATION = "<your-region>"
+$AKS_NAME = "aks-$(63533475)"
+$RESOURCE_GROUP = "azure-rg"
+$LOCATION = "swedencentral"
 $SUBSCRIPTION_ID = "<your-subscription-id>"
 $IDENTITY_RESOURCE_NAME = "azure-alb-identity"
 $FEDERATED_IDENTITY_NAME = "azure-alb-identity"
