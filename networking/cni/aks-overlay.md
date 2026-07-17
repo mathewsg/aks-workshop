@@ -7,13 +7,14 @@ Set your environment variables:
 ```powershell
 $CLUSTER_NAME = "aks-$(63533475)"
 $RESOURCE_GROUP = "azure-rg"
-$REGION = "swedencentral"
+$LOCATION = "swedencentral"
+$VM_SKU="Standard_D2as_v5"
 ```
 
 ## Deploy the Cluster
 
 ```bash
-az aks create --name $CLUSTER_NAME --resource-group $RESOURCE_GROUP --location $REGION --network-plugin azure --network-plugin-mode overlay --pod-cidr 192.168.0.0/16 --generate-ssh-keys
+az aks create --node-count 2 --name $CLUSTER_NAME --resource-group $RESOURCE_GROUP --node-vm-size $VM_SKU --location $LOCATION --network-plugin azure --network-plugin-mode overlay --pod-cidr 192.168.0.0/16 --generate-ssh-keys
 ```
 
 ## Connect to the Cluster
