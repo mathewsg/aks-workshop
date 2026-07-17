@@ -1,6 +1,6 @@
-# Deploy Application Gateway for Containers ALB Controller - AKS Add-On
+# Deploy Application Gateway for Containers ALB Controller - Helm
 
-> Based on [Quickstart: Deploy Application Gateway for Containers ALB Controller - AKS Add-on](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller-addon)
+> Based on [Quickstart: Deploy Application Gateway for Containers ALB Controller - Helm](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller-helm)
 
 ## Prerequisites
 
@@ -11,6 +11,9 @@ $AKS_NAME = "<your-cluster-name>"
 $RESOURCE_GROUP = "<your-resource-group>"
 $LOCATION = "<your-region>"
 $SUBSCRIPTION_ID = "<your-subscription-id>"
+$IDENTITY_RESOURCE_NAME = "azure-alb-identity"
+$FEDERATED_IDENTITY_NAME = "azure-alb-identity"
+$CONTROLLER_NAMESPACE = "azure-alb-system"
 ```
 
 ### Sign In and Set Subscription
@@ -33,32 +36,62 @@ az provider register --namespace Microsoft.ServiceNetworking
 
 ```powershell
 az extension add --name alb
-az extension add --name aks-preview
 ```
 
-### Register Preview Features
+### Install Helm
 
 ```powershell
-az feature register --namespace "Microsoft.ContainerService" --name "ManagedGatewayAPIPreview"
-az feature register --namespace "Microsoft.ContainerService" --name "ApplicationLoadBalancerPreview"
+winget install helm.helm
 ```
 
-## Set Up AKS Cluster with the AKS Add-On
+### Enable Workload Identity on Existing Cluster
 
 > **Requirements:** Azure CNI or Azure CNI Overlay, workload identity enabled, supported AKS Kubernetes version, and a [region where AGC is available](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/overview#supported-regions).
-
-### Existing Cluster
-
-#### Enable Workload Identity
 
 ```powershell
 az aks update -g $RESOURCE_GROUP -n $AKS_NAME --enable-oidc-issuer --enable-workload-identity --no-wait
 ```
 
-#### Install ALB Controller Add-On
+## Create Managed Identity and Federate with AKS
 
 ```powershell
-az aks update --name $AKS_NAME --resource-group $RESOURCE_GROUP --enable-gateway-api --enable-application-load-balancer
+$mcResourceGroup = az aks show --resource-group $RESOURCE_GROUP --name $AKS_NAME --query "nodeResourceGroup" -o tsv
+$mcResourceGroupId = az group show --name $mcResourceGroup --query id -o tsv
+
+# Create the managed identity
+az identity create --resource-group $RESOURCE_GROUP --name $IDENTITY_RESOURCE_NAME
+$principalId = az identity show -g $RESOURCE_GROUP -n $IDENTITY_RESOURCE_NAME --query principalId -o tsv
+
+# Wait for identity replication
+Start-Sleep -Seconds 60
+
+# Assign Reader role on the MC resource group
+az role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal --scope $mcResourceGroupId --role "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+
+# Set up federation with AKS OIDC issuer
+$AKS_OIDC_ISSUER = az aks show -n $AKS_NAME -g $RESOURCE_GROUP --query "oidcIssuerProfile.issuerUrl" -o tsv
+
+az identity federated-credential create --name $FEDERATED_IDENTITY_NAME `
+    --identity-name $IDENTITY_RESOURCE_NAME `
+    --resource-group $RESOURCE_GROUP `
+    --issuer $AKS_OIDC_ISSUER `
+    --subject "system:serviceaccount:${CONTROLLER_NAMESPACE}:alb-controller-sa"
+```
+
+## Install ALB Controller via Helm
+
+```powershell
+$HELM_NAMESPACE = "default"
+
+az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_NAME
+
+$CLIENT_ID = az identity show -g $RESOURCE_GROUP -n $IDENTITY_RESOURCE_NAME --query clientId -o tsv
+
+helm install alb-controller oci://mcr.microsoft.com/application-lb/charts/alb-controller `
+    --namespace $HELM_NAMESPACE `
+    --version 1.11.3 `
+    --set albController.namespace=$CONTROLLER_NAMESPACE `
+    --set albController.podIdentity.clientID=$CLIENT_ID
 ```
 
 ## Verify the ALB Controller Installation
@@ -66,7 +99,7 @@ az aks update --name $AKS_NAME --resource-group $RESOURCE_GROUP --enable-gateway
 ### Verify ALB Controller Pods
 
 ```bash
-kubectl get pods -n kube-system | grep alb-controller
+kubectl get pods -n azure-alb-system
 ```
 
 Expected output — two pods in `Running` state:
@@ -82,4 +115,12 @@ alb-controller-6648c5d5c-au234   1/1     Running   0   4d6h
 kubectl get gatewayclass azure-alb-external -o yaml
 ```
 
-You should see a condition with `message: Valid GatewayClass` and `status: "True"`
+You should see a condition with `message: Valid GatewayClass` and `status: "True"`.
+
+## Uninstall ALB Controller
+
+```powershell
+helm uninstall alb-controller
+kubectl delete ns azure-alb-system
+kubectl delete gatewayclass azure-alb-external
+```
