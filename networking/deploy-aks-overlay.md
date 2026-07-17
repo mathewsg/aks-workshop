@@ -5,9 +5,9 @@
 Set your environment variables:
 
 ```powershell
-$CLUSTER_NAME = "<your-cluster-name>"
-$RESOURCE_GROUP = "<your-resource-group>"
-$REGION = "<your-region>"
+$CLUSTER_NAME = "aks-$(63533475)"
+$RESOURCE_GROUP = "azure-rg"
+$REGION = "swedencentral"
 ```
 
 ## Deploy the Cluster
