@@ -45,6 +45,5 @@ kubectl apply -f nginx-service.yaml
 ## Verify the Deployment and Service
 
 ```bash
-kubectl get pods
-kubectl get service nginx
+kubectl get service nginx -n nginx-app
 ```
