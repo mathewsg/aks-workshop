@@ -51,32 +51,12 @@ az role assignment create --assignee-object-id $principalId --assignee-principal
 
 ## Create ApplicationLoadBalancer Kubernetes Resource
 
-### Create Namespace
-
-```bash
-kubectl apply -f - <<EOF
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: alb-test-infra
-EOF
-```
-
-### Create the ApplicationLoadBalancer Resource
-
 > The ALB Controller will create the Application Gateway for Containers resource in Azure and an association to the specified subnet.
 
-```bash
-kubectl apply -f - <<EOF
-apiVersion: alb.networking.azure.io/v1
-kind: ApplicationLoadBalancer
-metadata:
-  name: alb-test
-  namespace: alb-test-infra
-spec:
-  associations:
-  - $ALB_SUBNET_ID
-EOF
+Replace the placeholder in the YAML file with the actual subnet ID and apply:
+
+```powershell
+(Get-Content alb-resource.yaml) -replace 'ALB_SUBNET_ID_PLACEHOLDER', $ALB_SUBNET_ID | kubectl apply -f -
 ```
 
 ## Validate Creation of Application Gateway for Containers
