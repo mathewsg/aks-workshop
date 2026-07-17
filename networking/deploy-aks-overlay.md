@@ -5,7 +5,7 @@
 Set your environment variables:
 
 ```powershell
-$CLUSTER_NAME = "aks-$(63533475)"
+$CLUSTER_NAME = "aks-$(63533420)"
 $RESOURCE_GROUP = "azure-rg"
 $REGION = "swedencentral"
 ```
