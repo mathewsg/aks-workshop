@@ -23,16 +23,17 @@ az aks create --node-count 2 --name $CLUSTER_NAME --resource-group $RESOURCE_GRO
 az aks get-credentials --name $CLUSTER_NAME --resource-group $RESOURCE_GROUP
 ```
 
-## List Pods
-
-```bash
-kubectl get pods --all-namespaces
-```
 
 ## Deploy Sample Nginx Application
 
 ```bash
 kubectl apply -f nginx-deployment.yaml
+```
+
+## List Pods in nginx-app Namespace
+
+```bash
+kubectl get pods -n nginx-app -o wide
 ```
 
 ## Expose as LoadBalancer Service
