@@ -1,0 +1,15 @@
+{
+    "Name": "AKS Namespace Reader",
+    "Description": "Allows read access to pods, deployments, and services in a specific namespace.",
+    "Actions": [],
+    "NotActions": [],
+    "DataActions": [
+        "Microsoft.ContainerService/managedClusters/apps/deployments/read",
+        "Microsoft.ContainerService/managedClusters/pods/read",
+        "Microsoft.ContainerService/managedClusters/services/read"
+    ],
+    "NotDataActions": [],
+    "assignableScopes": [
+        "/subscriptions/<YOUR-SUBSCRIPTION-ID>"
+    ]
+}
