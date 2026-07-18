@@ -51,24 +51,15 @@ $CURRENT_USER = az ad signed-in-user show --query id -o tsv
 az role assignment create --role "Azure Kubernetes Service RBAC Admin" --assignee $CURRENT_USER --scope $AKS_ID
 ```
 
-## Create and Assign a Custom Role Scoped to the Namespace
+## Assign Role Scoped to the Namespace
 
-The custom role `AKS Namespace Reader` grants read access to pods and deployments in the `sample-app` namespace only.
-
-### Create the Custom Role
-
-```powershell
-(Get-Content namespace-reader-role.json) -replace 'SUBSCRIPTION_ID_PLACEHOLDER', $SUBSCRIPTION_ID | Set-Content namespace-reader-role.json
-az role definition create --role-definition '@namespace-reader-role.json'
-```
-
-### Assign the Custom Role to a User
+Assign the built-in `Azure Kubernetes Service RBAC Reader` role to the current user, scoped to the `sample-app` namespace:
 
 ```powershell
 $AKS_ID = az aks show --resource-group $RESOURCE_GROUP --name $AKS_NAME --query id -o tsv
 $TARGET_USER = az ad signed-in-user show --query id -o tsv
 
-az role assignment create --role "AKS Namespace Reader" --assignee $TARGET_USER --scope "$AKS_ID/namespaces/sample-app"
+az role assignment create --role "Azure Kubernetes Service RBAC Reader" --assignee $TARGET_USER --scope "$AKS_ID/namespaces/sample-app"
 ```
 
 ## Clean Up
@@ -84,10 +75,4 @@ az aks update --resource-group $RESOURCE_GROUP --name $AKS_NAME --disable-azure-
 ```powershell
 az role assignment list --scope $AKS_ID --query [].id -o tsv
 az role assignment delete --ids <ASSIGNMENT-ID>
-```
-
-### Delete Custom Role Definition
-
-```powershell
-az role definition delete --name "AKS Namespace Reader"
 ```
