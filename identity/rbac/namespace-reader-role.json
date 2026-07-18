@@ -10,6 +10,6 @@
     ],
     "NotDataActions": [],
     "assignableScopes": [
-        "/subscriptions/<YOUR-SUBSCRIPTION-ID>"
+        "/subscriptions/SUBSCRIPTION_ID_PLACEHOLDER"
     ]
 }

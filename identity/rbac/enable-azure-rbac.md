@@ -58,6 +58,7 @@ The custom role `AKS Namespace Reader` grants read access to pods and deployment
 ### Create the Custom Role
 
 ```powershell
+(Get-Content namespace-reader-role.json) -replace 'SUBSCRIPTION_ID_PLACEHOLDER', $SUBSCRIPTION_ID | Set-Content namespace-reader-role.json
 az role definition create --role-definition '@namespace-reader-role.json'
 ```
 
