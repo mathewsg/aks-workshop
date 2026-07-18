@@ -51,7 +51,7 @@ $CURRENT_USER = az ad signed-in-user show --query id -o tsv
 az role assignment create --role "Azure Kubernetes Service RBAC Reader" --assignee $CURRENT_USER --scope "$AKS_ID/namespaces/sample-app"
 ```
 
-## Install kubectl
+## Install kubelogin
 
 ```powershell
 az aks install-cli
