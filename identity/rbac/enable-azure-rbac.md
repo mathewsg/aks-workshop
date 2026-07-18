@@ -51,6 +51,21 @@ $CURRENT_USER = az ad signed-in-user show --query id -o tsv
 az role assignment create --role "Azure Kubernetes Service RBAC Reader" --assignee $CURRENT_USER --scope "$AKS_ID/namespaces/sample-app"
 ```
 
+## Install kubectl
+
+```powershell
+az aks install-cli
+```
+
+## Verify Access in a New Session
+
+Open a new PowerShell session and run:
+
+```powershell
+az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_NAME
+kubectl get pods -n sample-app
+```
+
 ## Clean Up
 
 ### Disable Azure RBAC
