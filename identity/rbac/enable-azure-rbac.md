@@ -42,24 +42,13 @@ Verify Azure RBAC is enabled:
 az aks show --resource-group $RESOURCE_GROUP --name $AKS_NAME --query "aadProfile.enableAzureRbac" -o tsv
 ```
 
-## Assign Azure Kubernetes Service RBAC Admin to Current User
+## Assign Azure Kubernetes Service RBAC Reader Scoped to the Namespace
 
 ```powershell
 $AKS_ID = az aks show --resource-group $RESOURCE_GROUP --name $AKS_NAME --query id -o tsv
 $CURRENT_USER = az ad signed-in-user show --query id -o tsv
 
-az role assignment create --role "Azure Kubernetes Service RBAC Admin" --assignee $CURRENT_USER --scope $AKS_ID
-```
-
-## Assign Role Scoped to the Namespace
-
-Assign the built-in `Azure Kubernetes Service RBAC Reader` role to the current user, scoped to the `sample-app` namespace:
-
-```powershell
-$AKS_ID = az aks show --resource-group $RESOURCE_GROUP --name $AKS_NAME --query id -o tsv
-$TARGET_USER = az ad signed-in-user show --query id -o tsv
-
-az role assignment create --role "Azure Kubernetes Service RBAC Reader" --assignee $TARGET_USER --scope "$AKS_ID/namespaces/sample-app"
+az role assignment create --role "Azure Kubernetes Service RBAC Reader" --assignee $CURRENT_USER --scope "$AKS_ID/namespaces/sample-app"
 ```
 
 ## Clean Up
