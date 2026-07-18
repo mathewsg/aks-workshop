@@ -9,7 +9,6 @@
 ```powershell
 $AKS_NAME = "aks-$(63533475)"
 $RESOURCE_GROUP = "azure-rg"
-$SUBSCRIPTION_ID = "<your-subscription-id>"
 ```
 
 ## Connect to the Cluster
