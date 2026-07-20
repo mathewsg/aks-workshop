@@ -11,6 +11,12 @@ $LOCATION = "swedencentral"
 $VM_SKU="Standard_D2as_v5"
 ```
 
+## Create Resource Group
+
+```powershell
+az group create --name $RESOURCE_GROUP --location $LOCATION
+```
+
 ## Deploy the Cluster
 
 ```bash
