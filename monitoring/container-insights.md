@@ -111,3 +111,45 @@ az monitor diagnostic-settings create `
 ```powershell
 az monitor diagnostic-settings list --resource $AKS_ID -o table
 ```
+
+## Deploy a Log-Generating Sample App
+
+Deploy a simple pod that continuously writes timestamped messages to stdout:
+
+```powershell
+kubectl run log-generator --image=busybox --restart=Never -- /bin/sh -c 'i=0; while true; do echo "$i [INFO] Heartbeat from log-generator pod - count=$i"; i=$((i+1)); sleep 5; done'
+```
+
+### Verify the Pod is Running and Producing Logs
+
+```powershell
+kubectl get pod log-generator
+kubectl logs log-generator
+```
+
+Expected output:
+
+```
+2026-07-23 10:00:00 [INFO] Heartbeat from log-generator pod - count=0
+2026-07-23 10:00:05 [INFO] Heartbeat from log-generator pod - count=1
+2026-07-23 10:00:10 [INFO] Heartbeat from log-generator pod - count=2
+```
+
+## Query ContainerLogV2 for Stdout
+
+Wait ~5 minutes for logs to flow into Log Analytics, then navigate to **Log Analytics Workspace > Logs** in the Azure Portal and run:
+
+```kql
+ContainerLogV2
+| where PodName == "log-generator"
+| where LogSource == "stdout"
+| project TimeGenerated, PodName, ContainerName, LogMessage
+| order by TimeGenerated desc
+| take 50
+```
+
+### Cleanup
+
+```powershell
+kubectl delete pod log-generator
+```
