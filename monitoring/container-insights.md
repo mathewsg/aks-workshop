@@ -92,7 +92,7 @@ kubectl get ds -n kube-system
 Deploy a simple pod that continuously writes timestamped messages to stdout:
 
 ```powershell
-kubectl run log-generator --image=busybox --restart=Never -- /bin/sh -c 'i=0; while true; do echo "$i [INFO] Heartbeat from log-generator pod - count=$i"; i=$((i+1)); sleep 5; done'
+kubectl run log-generator --image=busybox --restart=Never -- /bin/sh -c 'i=0; while true; do echo $i [INFO] Heartbeat from log-generator pod - count=$i; i=$((i+1)); sleep 5; done'
 ```
 
 ### Verify the Pod is Running and Producing Logs
