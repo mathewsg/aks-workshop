@@ -9,7 +9,7 @@ $AKS_NAME = "aks-mon"
 $RESOURCE_GROUP = "azure-rg"
 $LOCATION = "swedencentral"
 $VM_SKU = "Standard_D2as_v5"
-$LOG_ANALYTICS_WORKSPACE = "law-aks-monitoring"
+$LOG_ANALYTICS_WORKSPACE_NAME = "law-aks-monitoring"
 ```
 
 ### Create Resource Group
@@ -44,12 +44,12 @@ az aks get-credentials --name $AKS_NAME --resource-group $RESOURCE_GROUP
 ```powershell
 az monitor log-analytics workspace create `
     --resource-group $RESOURCE_GROUP `
-    --workspace-name $LOG_ANALYTICS_WORKSPACE `
+    --workspace-name $LOG_ANALYTICS_WORKSPACE_NAME `
     --location $LOCATION
 
-$LOG_ANALYTICS_WORKSPACE_ID = az monitor log-analytics workspace show `
+$LOG_ANALYTICS_WORKSPACE_NAME_ID = az monitor log-analytics workspace show `
     --resource-group $RESOURCE_GROUP `
-    --workspace-name $LOG_ANALYTICS_WORKSPACE `
+    --workspace-name $LOG_ANALYTICS_WORKSPACE_NAME `
     --query id -o tsv
 ```
 
@@ -60,7 +60,7 @@ az aks enable-addons `
     --addon monitoring `
     --name $AKS_NAME `
     --resource-group $RESOURCE_GROUP `
-    --workspace-resource-id $LOG_ANALYTICS_WORKSPACE_ID
+    --workspace-resource-id $LOG_ANALYTICS_WORKSPACE_NAME_ID
 ```
 
 ## Verify AMA (Azure Monitor Agent) Pods
@@ -97,7 +97,7 @@ $AKS_ID = az aks show --name $AKS_NAME --resource-group $RESOURCE_GROUP --query 
 az monitor diagnostic-settings create `
     --name "aks-diagnostics" `
     --resource $AKS_ID `
-    --workspace $LOG_ANALYTICS_WORKSPACE_ID `
+    --workspace $LOG_ANALYTICS_WORKSPACE_NAME_ID `
     --logs '[
         {"categoryGroup": "allLogs", "enabled": true}
     ]' `
