@@ -87,31 +87,6 @@ kubectl get pods -n kube-system -l component=ama-logs
 kubectl get ds -n kube-system
 ```
 
-## Enable Diagnostic Settings
-
-Enable diagnostic settings to send AKS control plane logs to Log Analytics:
-
-```powershell
-$AKS_ID = az aks show --name $AKS_NAME --resource-group $RESOURCE_GROUP --query id -o tsv
-
-az monitor diagnostic-settings create `
-    --name "aks-diagnostics" `
-    --resource $AKS_ID `
-    --workspace $LOG_ANALYTICS_WORKSPACE_NAME_ID `
-    --logs '[
-        {"categoryGroup": "allLogs", "enabled": true}
-    ]' `
-    --metrics '[
-        {"category": "AllMetrics", "enabled": true}
-    ]'
-```
-
-### Verify Diagnostic Settings
-
-```powershell
-az monitor diagnostic-settings list --resource $AKS_ID -o table
-```
-
 ## Deploy a Log-Generating Sample App
 
 Deploy a simple pod that continuously writes timestamped messages to stdout:
