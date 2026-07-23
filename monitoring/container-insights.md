@@ -5,7 +5,7 @@
 ### Set Environment Variables
 
 ```powershell
-$CLUSTER_NAME = "aks-mon"
+$AKS_NAME = "aks-mon"
 $RESOURCE_GROUP = "azure-rg"
 $LOCATION = "swedencentral"
 $VM_SKU = "Standard_D2as_v5"
@@ -22,7 +22,7 @@ az group create --name $RESOURCE_GROUP --location $LOCATION
 
 ```powershell
 az aks create `
-    --name $CLUSTER_NAME `
+    --name $AKS_NAME `
     --resource-group $RESOURCE_GROUP `
     --location $LOCATION `
     --node-count 2 `
@@ -36,7 +36,7 @@ az aks create `
 ### Connect to the Cluster
 
 ```powershell
-az aks get-credentials --name $CLUSTER_NAME --resource-group $RESOURCE_GROUP
+az aks get-credentials --name $AKS_NAME --resource-group $RESOURCE_GROUP
 ```
 
 ## Deploy Log Analytics Workspace
@@ -58,7 +58,7 @@ $LOG_ANALYTICS_WORKSPACE_ID = az monitor log-analytics workspace show `
 ```powershell
 az aks enable-addons `
     --addon monitoring `
-    --name $CLUSTER_NAME `
+    --name $AKS_NAME `
     --resource-group $RESOURCE_GROUP `
     --workspace-resource-id $LOG_ANALYTICS_WORKSPACE_ID
 ```
@@ -92,7 +92,7 @@ kubectl get ds -n kube-system
 Enable diagnostic settings to send AKS control plane logs to Log Analytics:
 
 ```powershell
-$AKS_ID = az aks show --name $CLUSTER_NAME --resource-group $RESOURCE_GROUP --query id -o tsv
+$AKS_ID = az aks show --name $AKS_NAME --resource-group $RESOURCE_GROUP --query id -o tsv
 
 az monitor diagnostic-settings create `
     --name "aks-diagnostics" `

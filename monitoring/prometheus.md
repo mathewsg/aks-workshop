@@ -5,7 +5,7 @@
 ### Set Environment Variables
 
 ```powershell
-$CLUSTER_NAME = "aks-mon"
+$AKS_NAME = "aks-mon"
 $RESOURCE_GROUP = "azure-rg"
 $LOCATION = "swedencentral"
 $LOG_ANALYTICS_WORKSPACE = "law-aks-monitoring"
@@ -38,7 +38,7 @@ $AZURE_MONITOR_WORKSPACE_ID = az monitor account show `
 
 ```powershell
 az aks update `
-    --name $CLUSTER_NAME `
+    --name $AKS_NAME `
     --resource-group $RESOURCE_GROUP `
     --enable-azure-monitor-metrics `
     --azure-monitor-workspace-resource-id $AZURE_MONITOR_WORKSPACE_ID
@@ -83,7 +83,7 @@ az role assignment create `
 
 ```powershell
 az aks update `
-    --name $CLUSTER_NAME `
+    --name $AKS_NAME `
     --resource-group $RESOURCE_GROUP `
     --grafana-resource-id $GRAFANA_ID
 ```
